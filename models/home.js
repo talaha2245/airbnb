@@ -16,7 +16,9 @@ module.exports = class Home {
   save() {
     Home.fetchAll((registeredHomes) => {
       if (this.id) {
-        const existingHomeIndex = registeredHomes.findIndex(home => home.id === this.id);
+        const existingHomeIndex = registeredHomes.findIndex(
+          (home) => home.id === this.id
+        );
         if (existingHomeIndex >= 0) {
           registeredHomes[existingHomeIndex] = this;
         }
@@ -24,38 +26,41 @@ module.exports = class Home {
         this.id = Math.random().toString();
         registeredHomes.push(this);
       }
-      
+
       const homeDataPath = path.join(rootDir, "data", "homes.json");
-      fs.writeFile(homeDataPath, JSON.stringify(registeredHomes, null, 2), (error) => {
-        if (error) {
-          console.error("Error saving home data:", error);
-          throw error;
+      fs.writeFile(
+        homeDataPath,
+        JSON.stringify(registeredHomes, null, 2),
+        (error) => {
+          if (error) {
+            console.error("Error saving home data:", error);
+            throw error;
+          }
         }
-      });
+      );
     });
   }
 
   static deleteById(id, callback) {
     Home.fetchAll((registeredHomes) => {
-      const updatedHomes = registeredHomes.filter(home => home.id !== id);
+      const updatedHomes = registeredHomes.filter((home) => home.id !== id);
       const homeDataPath = path.join(rootDir, "data", "homes.json");
-      fs.writeFile(homeDataPath, JSON.stringify(updatedHomes, null, 2), (error) => {
-        if (error) {
-          console.error("Error deleting home:", error);
-          throw error;
+      fs.writeFile(
+        homeDataPath,
+        JSON.stringify(updatedHomes, null, 2),
+        (error) => {
+          if (error) {
+            console.error("Error deleting home:", error);
+            throw error;
+          }
+          callback();
         }
-        callback();
-      });
+      );
     });
   }
 
-  static findById(id, callback) {
-    Home.fetchAll((registeredHomes) => {
-      const home = registeredHomes.find(home => home.id === id);
-      callback(home);
-    });
-  }
 
+  // sare ghar files se padke a k list restun karth hai
   static fetchAll(callback) {
     const homeDataPath = path.join(rootDir, "data", "homes.json");
     fs.readFile(homeDataPath, (err, data) => {
@@ -71,6 +76,13 @@ module.exports = class Home {
         console.error("Error parsing homes data:", error);
         callback([]);
       }
+    });
+  }
+
+  static findByid(id, callback) {
+    this.fetchAll((homes) => {
+      const homefound = homes.find((home) => home.id === id);
+      callback(homefound);
     });
   }
 };
