@@ -3,6 +3,10 @@ const fs = require("fs");
 const path = require("path");
 const rootDir = require("../utils/pathUtil");
 
+
+
+// i have just crretaed the home objeect which cary
+// mltiple functions related to fetch all items
 module.exports = class Home {
   constructor(id, houseName, price, location, rating, photoUrl) {
     this.id = id;
@@ -12,7 +16,9 @@ module.exports = class Home {
     this.rating = rating;
     this.photoUrl = photoUrl;
   }
-
+  // this is usinsg the principal of hosting
+  // the fetch all is delcared beith
+  
   save() {
     Home.fetchAll((registeredHomes) => {
       if (this.id) {
@@ -59,7 +65,6 @@ module.exports = class Home {
     });
   }
 
-
   // sare ghar files se padke a k list restun karth hai
   static fetchAll(callback) {
     const homeDataPath = path.join(rootDir, "data", "homes.json");
@@ -72,14 +77,15 @@ module.exports = class Home {
       try {
         const homes = JSON.parse(data);
         callback(homes);
-      } catch (error) {
-        console.error("Error parsing homes data:", error);
+      } catch (err) {
+        console.error("Error parsing homes data:", err);
         callback([]);
       }
     });
   }
 
   static findByid(id, callback) {
+    // fetch all gives callback by homes
     this.fetchAll((homes) => {
       const homefound = homes.find((home) => home.id === id);
       callback(homefound);

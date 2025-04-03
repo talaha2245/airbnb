@@ -12,9 +12,12 @@ const errorsController = require("./controllers/errors");
 
 const app = express();
 
+// used to set ejs ie embided java script 
 app.set('view engine', 'ejs');
 app.set('views', 'views');
 
+
+// url encoder convert data into the values 
 app.use(express.urlencoded());
 app.use(storeRouter);
 app.use("/host", hostRouter);
