@@ -18,7 +18,7 @@ app.set('views', 'views');
 
 
 // url encoder convert data into the values 
-app.use(express.urlencoded());
+app.use(express.urlencoded({ extended: true }));
 app.use(storeRouter);
 app.use("/host", hostRouter);
 
@@ -26,7 +26,7 @@ app.use(express.static(path.join(rootDir, 'public')))
 
 app.use(errorsController.pageNotFound);
 
-const PORT = 3004;
+const PORT = 3001;
 app.listen(PORT, () => {
   console.log(`Server running on address http://localhost:${PORT}`);
 });

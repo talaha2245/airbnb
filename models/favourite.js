@@ -1,41 +1,79 @@
+// Import required modules
 const fs = require("fs");
 const path = require("path");
 const rootDir = require("../utils/pathUtil");
+const Home = require("./home");
 
+// Define the path to the favourites.json file
+const favouritesPath = path.join(rootDir, "data", "favourites.json");
 
-// i have just crretaed the home objeect which cary
-// mltiple functions related to fetch all items
-module.exports = class favourite {
+// Export the Favourite class
+module.exports = class Favourite {
+  /**
+   * Adds a home to the favourites list
+   * @param {string} homeid - The ID of the home to add to favourites
+   * @param {function} callback - Callback function(error, favourites)
+   */
   static addToFavourite(homeid, callback) {
-    this.fetchFavourite((favourites) => {
-      let flag = 0;
-      favourites.map((item) => {
-        if (item.id === homeid) {
-          console.log(
-            "the home is aldready is added in the favourites sections"
-          );
-          flag = 1;
-        }
-      });
+    // Validate home ID
+    if (!homeid) {
+      return callback(new Error('Home ID is required'), null);
+    }
 
-      // getting the the data using the home id from the home id uisng the home list
-      favourites.push()
+    // Read existing favorites
+    fs.readFile(favouritesPath, 'utf8', (err, data) => {
+      // Initialize favorites array
+      let favourites = [];
+      
+      try {
+        // Parse existing favorites or start with empty array
+        favourites = err ? [] : JSON.parse(data || '[]');
+        
+        // Check if home is already in favorites
+        if (favourites.some(fav => fav.id === homeid)) {
+          return callback(null, favourites);
+        }
+
+        // Find the home in all homes
+        Home.fetchAll(homes => {
+          const homeToAdd = homes.find(home => home.id === homeid);
+          
+          if (!homeToAdd) {
+            return callback(new Error('Home not found'), favourites);
+          }
+
+          // Add home to favorites
+          favourites.push(homeToAdd);
+
+          // Save updated favorites
+          fs.writeFile(favouritesPath, JSON.stringify(favourites, null, 2), err => {
+            if (err) {
+              return callback(err, favourites);
+            }
+            callback(null, favourites);
+          });
+        });
+      } catch (error) {
+        callback(error, favourites);
+      }
     });
   }
 
+  /**
+   * Fetches all favourite homes
+   * @param {function} callback - Callback function(favourites)
+   */
   static fetchFavourite(callback) {
-    const favouritesPath = path.join(rootDir, "data", "favourites.json");
-    fs.readFile(favouritesPath, (err, data) => {
-      if (!err) {
-        try {
-          const data1 = JSON.parse(data); // Fixed JSON parsing issue
-          callback(data1); // Ensure correct data format
-        } catch (parseError) {
-          // if reding is correctly done but the data is not properly parsed this error is coocured
-          console.log("Error parsing JSON:", parseError);
-        }
-      } else {
-        console.log("error has coccured ", err);
+    // Read favorites file
+    fs.readFile(favouritesPath, 'utf8', (err, data) => {
+      try {
+        // Return parsed favorites or empty array
+        const favourites = err ? [] : JSON.parse(data || '[]');
+        callback(favourites);
+      } catch (error) {
+        // Return empty array on error
+        console.error('Error reading favorites:', error);
+        callback([]);
       }
     });
   }
